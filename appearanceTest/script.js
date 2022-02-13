@@ -11,6 +11,7 @@ class Cell {
         this.bottom = bottom;
         this.left = left;
         this.right = right
+        this.beenTo = false;
     }
 }
 
@@ -43,8 +44,10 @@ class Position {
     
 }
 
-let pos = new Position(0, 5);
+let startPos = new Position(0, 5);
+let endPos = new Position(9, 6);
 
+let pos = startPos;
 
 function start() {
     rows = 10;
@@ -73,6 +76,8 @@ function generate(rows, cols, data) {
             currentCellSpan.setAttribute("data-bottom", cell.bottom);
             currentCellSpan.setAttribute("data-left", cell.left);
             currentCellSpan.setAttribute("data-right", cell.right);
+            currentCellSpan.setAttribute("data-been-to", cell.beenTo);
+
 
             currentCellCanvas = document.createElement("canvas");
             currentCellCanvas.setAttribute("class", "cell__canvas");
@@ -121,22 +126,30 @@ function generate(rows, cols, data) {
                 console.log(span);
                 
                 if ((span.dataset.top === 'false')) {
-                    canvas = span.firstChild;
-                    context = canvas.getContext("2d");
-                    context.strokeStyle = "red";
-                    context.lineWidth = 5;
-                    context.moveTo(Math.floor(width / 2), Math.floor(height / 2));
-                    context.lineTo(Math.floor(width / 2), 0);
-                    context.stroke();
-                    pos.up();
-                    span = spans[pos.y][pos.x]
-                    canvas = span.firstChild;
-                    context = canvas.getContext("2d");
-                    context.strokeStyle = "red";
-                    context.lineWidth = 5;
-                    context.moveTo(Math.floor(width / 2), height);
-                    context.lineTo(Math.floor(width / 2), Math.floor(height / 2));
-                    context.stroke();
+                    if (spans[pos.y - 1][pos.x].dataset.beenTo === 'false') {
+                        span.dataset.beenTo = "true"; 
+                        canvas = span.firstChild;
+                        context = canvas.getContext("2d");
+                        context.strokeStyle = "red";
+                        context.lineWidth = 5;
+                        context.moveTo(Math.floor(width / 2), Math.floor(height / 2));
+                        context.lineTo(Math.floor(width / 2), 0);
+                        context.stroke();
+                        pos.up();
+                        span = spans[pos.y][pos.x]
+                        canvas = span.firstChild;
+                        context = canvas.getContext("2d");
+                        context.strokeStyle = "red";
+                        context.lineWidth = 5;
+                        context.moveTo(Math.floor(width / 2), height);
+                        context.lineTo(Math.floor(width / 2), Math.floor(height / 2));
+                        context.stroke();
+                        span.dataset.beenTo = "true";
+                    }
+                    else {
+                        resetCell(span);
+                        pos.up();
+                    }
                 }
                 else {
                     console.log("invalid move: upper wall");
@@ -153,23 +166,32 @@ function generate(rows, cols, data) {
                 console.log(span);
                 
                 if ((span.dataset.bottom === 'false')) {
-                    canvas = span.firstChild;
-                    context = canvas.getContext("2d");
-                    context.strokeStyle = "red";
-                    context.lineWidth = 5;
-                    context.moveTo(Math.floor(width / 2), Math.floor(height / 2));
-                    context.lineTo(Math.floor(width / 2), height);
-                    context.stroke();
-                    pos.down();
-                    span = spans[pos.y][pos.x]
-                    canvas = span.firstChild;
-                    context = canvas.getContext("2d");
-                    context.strokeStyle = "red";
-                    context.lineWidth = 5;
-                    context.moveTo(Math.floor(width / 2), 0);
-                    context.lineTo(Math.floor(width / 2), Math.floor(height / 2));
-                    context.stroke();
+                    if (spans[pos.y + 1][pos.x].dataset.beenTo === 'false') {
+                        span.dataset.beenTo = "true";
+                        canvas = span.firstChild;
+                        context = canvas.getContext("2d");
+                        context.strokeStyle = "red";
+                        context.lineWidth = 5;
+                        context.moveTo(Math.floor(width / 2), Math.floor(height / 2));
+                        context.lineTo(Math.floor(width / 2), height);
+                        context.stroke();
+                        pos.down();
+                        span = spans[pos.y][pos.x]
+                        canvas = span.firstChild;
+                        context = canvas.getContext("2d");
+                        context.strokeStyle = "red";
+                        context.lineWidth = 5;
+                        context.moveTo(Math.floor(width / 2), 0);
+                        context.lineTo(Math.floor(width / 2), Math.floor(height / 2));
+                        context.stroke();
+                        span.dataset.beenTo="true";
+                    }
+                    else {
+                        resetCell(span);
+                        pos.down();
+                    }
                 }
+                
                 else {
                     console.log("invalid move: bottom wall");
                 }
@@ -185,22 +207,30 @@ function generate(rows, cols, data) {
                 console.log(span);
                 
                 if ((span.dataset.left === 'false')) {
-                    canvas = span.firstChild;
-                    context = canvas.getContext("2d");
-                    context.strokeStyle = "red";
-                    context.lineWidth = 5;
-                    context.moveTo(Math.floor(width / 2), Math.floor(height / 2));
-                    context.lineTo(0, Math.floor(height / 2));
-                    context.stroke();
-                    pos.left();
-                    span = spans[pos.y][pos.x]
-                    canvas = span.firstChild;
-                    context = canvas.getContext("2d");
-                    context.strokeStyle = "red";
-                    context.lineWidth = 5;
-                    context.moveTo(width, Math.floor(height / 2));
-                    context.lineTo(Math.floor(width / 2), Math.floor(height / 2));
-                    context.stroke();
+                    if (spans[pos.y][pos.x - 1].dataset.beenTo === 'false') {
+                        span.dataset.beenTo = "true";
+                        canvas = span.firstChild;
+                        context = canvas.getContext("2d");
+                        context.strokeStyle = "red";
+                        context.lineWidth = 5;
+                        context.moveTo(Math.floor(width / 2), Math.floor(height / 2));
+                        context.lineTo(0, Math.floor(height / 2));
+                        context.stroke();
+                        pos.left();
+                        span = spans[pos.y][pos.x]
+                        canvas = span.firstChild;
+                        context = canvas.getContext("2d");
+                        context.strokeStyle = "red";
+                        context.lineWidth = 5;
+                        context.moveTo(width, Math.floor(height / 2));
+                        context.lineTo(Math.floor(width / 2), Math.floor(height / 2));
+                        context.stroke();
+                        span.dataset.beenTo = "true";
+                    }
+                    else {
+                        resetCell(span);
+                        pos.left();
+                    }
                 }
                 else {
                     console.log("invalid move: left wall");
@@ -217,22 +247,30 @@ function generate(rows, cols, data) {
                 console.log(span);
                 
                 if ((span.dataset.right === 'false')) {
-                    canvas = span.firstChild;
-                    context = canvas.getContext("2d");
-                    context.strokeStyle = "red";
-                    context.lineWidth = 5;
-                    context.moveTo(Math.floor(width / 2), Math.floor(height / 2));
-                    context.lineTo(width, Math.floor(height / 2));
-                    context.stroke();
-                    pos.right();
-                    span = spans[pos.y][pos.x]
-                    canvas = span.firstChild;
-                    context = canvas.getContext("2d");
-                    context.strokeStyle = "red";
-                    context.lineWidth = 5;
-                    context.moveTo(0, Math.floor(height / 2));
-                    context.lineTo(Math.floor(width / 2), Math.floor(height / 2));
-                    context.stroke();
+                    if (spans[pos.y][pos.x + 1].dataset.beenTo === 'false') {
+                        span.dataset.beenTo = "true";
+                        canvas = span.firstChild;
+                        context = canvas.getContext("2d");
+                        context.strokeStyle = "red";
+                        context.lineWidth = 5;
+                        context.moveTo(Math.floor(width / 2), Math.floor(height / 2));
+                        context.lineTo(width, Math.floor(height / 2));
+                        context.stroke();
+                        pos.right();
+                        span = spans[pos.y][pos.x]
+                        canvas = span.firstChild;
+                        context = canvas.getContext("2d");
+                        context.strokeStyle = "red";
+                        context.lineWidth = 5;
+                        context.moveTo(0, Math.floor(height / 2));
+                        context.lineTo(Math.floor(width / 2), Math.floor(height / 2));
+                        context.stroke();
+                        span.dataset.beenTo = "true";
+                    }
+                    else {
+                        resetCell(span);
+                        pos.right();
+                    }
                 }
                 else {
                     console.log("invalid move: right wall");
@@ -248,6 +286,36 @@ function generate(rows, cols, data) {
 
 function onKeyDown(key) {
 
+}
+
+function resetCell(span) {
+    span.dataset.beenTo = "false";
+    canvas = span.firstChild;
+    context = canvas.getContext("2d");
+    context.strokeStyle = "grey";
+    context.clearRect(0, 0, width, height);
+    context.beginPath();
+    context.lineWidth = 4;
+    if (span.dataset.top === "true") {
+        context.moveTo(0, 0);
+        context.lineTo(width, 0);
+        context.stroke();
+    }
+    if (span.dataset.bottom === "true") {
+        context.moveTo(0, height);
+        context.lineTo(width, height);
+        context.stroke();
+    }
+    if (span.dataset.left === "true") {
+        context.moveTo(0, 0);
+        context.lineTo(0, height);
+        context.stroke();
+    }
+    if (span.dataset.right === "true") {
+        context.moveTo(width, 0);
+        context.lineTo(width, height);
+        context.stroke();
+    }
 }
 
 
