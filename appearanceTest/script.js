@@ -1,4 +1,4 @@
-container = docuemnt.querySelector("#container");
+container = document.querySelector("#container");
 
 class Cell {
     constructor(x, y, top, bottom, left, right) {
@@ -11,12 +11,112 @@ class Cell {
     }
 }
 
+class Position { 
+    constructor(x, y) {
+        this.x = x;
+        this.y = y;
+    }
+    up() { 
+        if (this.y > 0) {
+            this.y--;
+        }    
+    }
+    down() {
+        if (this.y < 9) {
+            this.y++;
+        }
+    }
+    left(){
+        if (this.x > 0) {
+            this.x--;
+        }
+    }
+
+    right() {
+        if (this.x < 0) {
+            this.x++;
+        }
+    }
+    
+}
+
+let pos = new Position(0, 0);
+
 function start() {
     rows = 10;
     cols = 10;
     data = getData();
     generate(rows, cols, data);
 }
+
+
+function generate(rows, cols, data) {
+    spans = [];
+
+    for (let row of data) {
+        spansSub = [];
+        currentRow = document.createElement("div");
+        currentRow.setAttribute("class", "row");
+        for (let cell of row) {
+            //console.log(cell);
+            currentCellSpan = document.createElement("span");
+            currentCellSpan.setAttribute("class", "cell");
+            currentCellSpan.setAttribute("height", "50");
+            currentCellSpan.setAttribute("width", "50");
+            currentCellSpan.setAttribute("data-x", cell.x);
+            currentCellSpan.setAttribute("data-y", cell.y);
+            currentCellSpan.setAttribute("data-top", cell.top);
+            currentCellSpan.setAttribute("data-bottom", cell.bottom);
+            currentCellSpan.setAttribute("data-left", cell.left);
+            currentCellSpan.setAttribute("data-right", cell.right);
+
+            currentCellCanvas = document.createElement("canvas");
+            currentCellCanvas.setAttribute("class", "cell__canvas");
+            currentCellCanvas.setAttribute("width", "50");
+            currentCellCanvas.setAttribute("height", "50");
+
+            currentCellSpan.appendChild(currentCellCanvas);
+            currentRow.appendChild(currentCellSpan);
+
+            spans.push(currentCellSpan);
+            context = currentCellCanvas.getContext("2d");
+            context.strokeStyle = "grey";
+            context.lineWidth = 4;
+            if (cell.top) {
+                context.moveTo(0, 0);
+                context.lineTo(50, 0);
+                context.stroke();
+            }
+            if (cell.bottom) {
+                context.moveTo(0, 50);
+                context.lineTo(50, 50);
+                context.stroke();
+            }
+            if (cell.left) {
+                context.moveTo(0, 0);
+                context.lineTo(0, 50);
+                context.stroke();
+            }
+            if (cell.right) {
+                context.moveTo(50, 0);
+                context.lineTo(50, 50);
+                context.stroke();
+            }
+            
+        }
+        spans.push(spansSub);
+        container.appendChild(currentRow);
+    }
+    console.log(spans);
+    document.addEventListener('keydown', (e) => {
+        console.log(e);
+    });
+}
+
+function onKeyDown(key) {
+
+}
+
 
 function getData() {
     //top, bottom, left, right
@@ -124,7 +224,7 @@ function getData() {
             new Cell(6, 9, true, false, true, false)
         ], 
         [
-            new Cell(7, 0, false, false, true, true),
+            new Cell(7, 0, false, false, true, false),
             new Cell(7, 1, true, true, false, true),
             new Cell(7, 2, false, false, true, false),
             
@@ -171,10 +271,6 @@ function getData() {
     ];
 
     return data;
-}
-
-function generate(rows, cols, data) {
-
 }
 
 start();
