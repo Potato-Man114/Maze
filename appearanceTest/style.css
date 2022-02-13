@@ -1,0 +1,31 @@
+body {
+    display: block;
+    margin: 10px;
+    overflow: scroll;    
+}
+
+.container {
+/*
+    border: solid;
+    border-width: thin;
+    border-color: black;
+*/  
+}
+
+.row {
+    margin: 0;
+    padding: 0;
+}
+
+.cell {
+    margin: 0;
+    padding: 0;
+    vertical-align: bottom; /* may not be necessary*/
+}
+
+.cell__canvas {
+    margin: 0px;
+    padding: 0px;
+    vertical-align: bottom;
+}
+
