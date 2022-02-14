@@ -11,7 +11,7 @@ class Cell {
         this.bottom = bottom;
         this.left = left;
         this.right = right
-        this.beenTo = false;
+        //this.beenTo = false;
     }
 }
 
@@ -46,16 +46,58 @@ class Position {
 
 let startPos = new Position(0, 5);
 let endPos = new Position(9, 6);
+let pos = new Position(0, 5);
 
-let pos = startPos;
+const currentCellColor = "green";
+const visitedCellColor = "red";
+const unvisitedCellColor = "grey";
+const startColor = "blue";
+const endColor = "orange";
+let firstMove = true;
 
 function start() {
     rows = 10;
     cols = 10;
     data = getData();
-    generate(rows, cols, data);
+    spans = generate(rows, cols, data);
+    showStart(spans);
+    showEnd(spans);
+    document.addEventListener('keydown', (e) => {
+        if (firstMove) {
+            clearStart();
+            firstMove = false;
+        }
+        onKeyDown(spans, e);
+    });
 }
 
+function showStart(spans) {
+    context = spans[startPos.y][startPos.x].firstChild.getContext("2d");
+    context.fillStyle = startColor;
+    context.fillRect(
+        Math.floor(width / 4),
+        Math.floor(height / 4),
+        Math.floor(width / 2),
+        Math.floor(height / 2)
+    );
+}
+
+function showEnd(spans) {
+    context = spans[endPos.y][endPos.x].firstChild.getContext("2d");
+    context.fillStyle = endColor;
+    context.fillRect(
+        Math.floor(width / 4),
+        Math.floor(height / 4),
+        Math.floor(width / 2),
+        Math.floor(height / 2)
+    );
+}
+
+function clearStart() {
+    context = spans[startPos.y][startPos.x].firstChild.getContext("2d");
+    context.clearRect(0, 0, width, height);
+    console.log("start cleared");
+}
 
 function generate(rows, cols, data) {
     spans = [];
@@ -65,7 +107,6 @@ function generate(rows, cols, data) {
         currentRow = document.createElement("div");
         currentRow.setAttribute("class", "row");
         for (let cell of row) {
-            //console.log(cell);
             currentCellSpan = document.createElement("span");
             currentCellSpan.setAttribute("class", "cell");
             currentCellSpan.setAttribute("height", `${height}`);
@@ -76,13 +117,13 @@ function generate(rows, cols, data) {
             currentCellSpan.setAttribute("data-bottom", cell.bottom);
             currentCellSpan.setAttribute("data-left", cell.left);
             currentCellSpan.setAttribute("data-right", cell.right);
-            currentCellSpan.setAttribute("data-been-to", cell.beenTo);
+            //currentCellSpan.setAttribute("data-been-to", cell.beenTo);
 
 
             currentCellCanvas = document.createElement("canvas");
             currentCellCanvas.setAttribute("class", "cell__canvas");
-            currentCellCanvas.setAttribute("width", `${height}`);
-            currentCellCanvas.setAttribute("height", `${width}`);
+            currentCellCanvas.setAttribute("height", `${height}`);
+            currentCellCanvas.setAttribute("width", `${width}`);
 
             currentCellSpan.appendChild(currentCellCanvas);
             currentRow.appendChild(currentCellSpan);
@@ -117,179 +158,151 @@ function generate(rows, cols, data) {
         container.appendChild(currentRow);
     }
     console.log(spans);
-    document.addEventListener('keydown', (e) => {
-        console.log(e);
-        console.log("pos: " + pos.x + ", " + pos.y);
-        if (e.key == "w") {
-            if (pos.y != 0) {
-                span = spans[pos.y][pos.x]
-                console.log(span);
-                
-                if ((span.dataset.top === 'false')) {
-                    if (spans[pos.y - 1][pos.x].dataset.beenTo === 'false') {
-                        span.dataset.beenTo = "true"; 
-                        canvas = span.firstChild;
-                        context = canvas.getContext("2d");
-                        context.strokeStyle = "red";
-                        context.lineWidth = 5;
-                        context.moveTo(Math.floor(width / 2), Math.floor(height / 2));
-                        context.lineTo(Math.floor(width / 2), 0);
-                        context.stroke();
-                        pos.up();
-                        span = spans[pos.y][pos.x]
-                        canvas = span.firstChild;
-                        context = canvas.getContext("2d");
-                        context.strokeStyle = "red";
-                        context.lineWidth = 5;
-                        context.moveTo(Math.floor(width / 2), height);
-                        context.lineTo(Math.floor(width / 2), Math.floor(height / 2));
-                        context.stroke();
-                        span.dataset.beenTo = "true";
-                    }
-                    else {
-                        resetCell(span);
-                        pos.up();
-                    }
-                }
-                else {
-                    console.log("invalid move: upper wall");
-                }
-            }
-            else {
-                console.log("invalid move: upper border");
-            }
-            
-        }
-        else if (e.key == "s") {
-            if (pos.y != 9) {
-                span = spans[pos.y][pos.x]
-                console.log(span);
-                
-                if ((span.dataset.bottom === 'false')) {
-                    if (spans[pos.y + 1][pos.x].dataset.beenTo === 'false') {
-                        span.dataset.beenTo = "true";
-                        canvas = span.firstChild;
-                        context = canvas.getContext("2d");
-                        context.strokeStyle = "red";
-                        context.lineWidth = 5;
-                        context.moveTo(Math.floor(width / 2), Math.floor(height / 2));
-                        context.lineTo(Math.floor(width / 2), height);
-                        context.stroke();
-                        pos.down();
-                        span = spans[pos.y][pos.x]
-                        canvas = span.firstChild;
-                        context = canvas.getContext("2d");
-                        context.strokeStyle = "red";
-                        context.lineWidth = 5;
-                        context.moveTo(Math.floor(width / 2), 0);
-                        context.lineTo(Math.floor(width / 2), Math.floor(height / 2));
-                        context.stroke();
-                        span.dataset.beenTo="true";
-                    }
-                    else {
-                        resetCell(span);
-                        pos.down();
-                    }
-                }
-                
-                else {
-                    console.log("invalid move: bottom wall");
-                }
-            }
-            else {
-                console.log("invalid move: bottom border");
-            }
-               
-        }
-        else if (e.key == "a") {
-            if (pos.x != 0) {
-                span = spans[pos.y][pos.x]
-                console.log(span);
-                
-                if ((span.dataset.left === 'false')) {
-                    if (spans[pos.y][pos.x - 1].dataset.beenTo === 'false') {
-                        span.dataset.beenTo = "true";
-                        canvas = span.firstChild;
-                        context = canvas.getContext("2d");
-                        context.strokeStyle = "red";
-                        context.lineWidth = 5;
-                        context.moveTo(Math.floor(width / 2), Math.floor(height / 2));
-                        context.lineTo(0, Math.floor(height / 2));
-                        context.stroke();
-                        pos.left();
-                        span = spans[pos.y][pos.x]
-                        canvas = span.firstChild;
-                        context = canvas.getContext("2d");
-                        context.strokeStyle = "red";
-                        context.lineWidth = 5;
-                        context.moveTo(width, Math.floor(height / 2));
-                        context.lineTo(Math.floor(width / 2), Math.floor(height / 2));
-                        context.stroke();
-                        span.dataset.beenTo = "true";
-                    }
-                    else {
-                        resetCell(span);
-                        pos.left();
-                    }
-                }
-                else {
-                    console.log("invalid move: left wall");
-                }
-            }
-            else {
-                console.log("invalid move: left border");
-            }
-            
-        }
-        else if (e.key == "d") {
-            if (pos.x != 9) {
-                span = spans[pos.y][pos.x]
-                console.log(span);
-                
-                if ((span.dataset.right === 'false')) {
-                    if (spans[pos.y][pos.x + 1].dataset.beenTo === 'false') {
-                        span.dataset.beenTo = "true";
-                        canvas = span.firstChild;
-                        context = canvas.getContext("2d");
-                        context.strokeStyle = "red";
-                        context.lineWidth = 5;
-                        context.moveTo(Math.floor(width / 2), Math.floor(height / 2));
-                        context.lineTo(width, Math.floor(height / 2));
-                        context.stroke();
-                        pos.right();
-                        span = spans[pos.y][pos.x]
-                        canvas = span.firstChild;
-                        context = canvas.getContext("2d");
-                        context.strokeStyle = "red";
-                        context.lineWidth = 5;
-                        context.moveTo(0, Math.floor(height / 2));
-                        context.lineTo(Math.floor(width / 2), Math.floor(height / 2));
-                        context.stroke();
-                        span.dataset.beenTo = "true";
-                    }
-                    else {
-                        resetCell(span);
-                        pos.right();
-                    }
-                }
-                else {
-                    console.log("invalid move: right wall");
-                }
-            }
-            else {
-                console.log("invalid move: right border");
-            }
-            
-        }
-    });
+    return spans;
 }
 
-function onKeyDown(key) {
-
+function onKeyDown(spans, e) {
+    console.log(e);
+    console.log("pos: " + pos.x + ", " + pos.y);
+    if (e.key == "w") {
+        if (pos.y != 0) {
+            span = spans[pos.y][pos.x]
+            console.log(span);
+            if ((span.dataset.top === 'false')) {
+                //span.dataset.beenTo = "true"; 
+                canvas = span.firstChild;
+                context = canvas.getContext("2d");
+                context.strokeStyle = visitedCellColor;
+                context.lineWidth = 5;
+                context.moveTo(Math.floor(width / 2), Math.floor(height / 2));
+                context.lineTo(Math.floor(width / 2), 0);
+                context.stroke();
+                pos.up();
+                span = spans[pos.y][pos.x]
+                canvas = span.firstChild;
+                context = canvas.getContext("2d");
+                context.strokeStyle = currentCellColor;
+                context.lineWidth = 5;
+                context.moveTo(Math.floor(width / 2), height);
+                context.lineTo(Math.floor(width / 2), Math.floor(height / 2));
+                context.stroke();
+                //span.dataset.beenTo = "true";
+            }
+            else {
+                console.log("invalid move: upper wall");
+            }
+        }
+        else {
+            console.log("invalid move: upper border");
+        }
+        
+    }
+    else if (e.key == "s") {
+        if (pos.y != 9) {
+            span = spans[pos.y][pos.x]                
+            if ((span.dataset.bottom === 'false')) {
+                //span.dataset.beenTo = "true";
+                canvas = span.firstChild;
+                context = canvas.getContext("2d");
+                context.strokeStyle = visitedCellColor;
+                context.lineWidth = 5;
+                context.moveTo(Math.floor(width / 2), Math.floor(height / 2));
+                context.lineTo(Math.floor(width / 2), height);
+                context.stroke();
+                pos.down();
+                span = spans[pos.y][pos.x]
+                canvas = span.firstChild;
+                context = canvas.getContext("2d");
+                context.strokeStyle = currentCellColor;
+                context.lineWidth = 5;
+                context.moveTo(Math.floor(width / 2), 0);
+                context.lineTo(Math.floor(width / 2), Math.floor(height / 2));
+                context.stroke();
+                //span.dataset.beenTo="true";
+            }
+            
+            else {
+                console.log("invalid move: bottom wall");
+            }
+        }
+        else {
+            console.log("invalid move: bottom border");
+        }
+           
+    }
+    else if (e.key == "a") {
+        if (pos.x != 0) {
+            span = spans[pos.y][pos.x]
+            console.log(span);
+            
+            if ((span.dataset.left === 'false')) {
+                //span.dataset.beenTo = "true";
+                canvas = span.firstChild;
+                context = canvas.getContext("2d");
+                context.strokeStyle = visitedCellColor;
+                context.lineWidth = 5;
+                context.moveTo(Math.floor(width / 2), Math.floor(height / 2));
+                context.lineTo(0, Math.floor(height / 2));
+                context.stroke();
+                pos.left();
+                span = spans[pos.y][pos.x]
+                canvas = span.firstChild;
+                context = canvas.getContext("2d");
+                context.strokeStyle = currentCellColor;
+                context.lineWidth = 5;
+                context.moveTo(width, Math.floor(height / 2));
+                context.lineTo(Math.floor(width / 2), Math.floor(height / 2));
+                context.stroke();
+                //span.dataset.beenTo = "true";
+            }
+            else {
+                console.log("invalid move: left wall");
+            }
+        }
+        else {
+            console.log("invalid move: left border");
+        }    
+    }
+    else if (e.key == "d") {
+        if (pos.x != 9) {
+            span = spans[pos.y][pos.x]
+            console.log(span);
+            if ((span.dataset.right === 'false')) {
+                //span.dataset.beenTo = "true";
+                canvas = span.firstChild;
+                context = canvas.getContext("2d");
+                context.strokeStyle = visitedCellColor;
+                context.lineWidth = 5;
+                context.moveTo(Math.floor(width / 2), Math.floor(height / 2));
+                context.lineTo(width, Math.floor(height / 2));
+                context.stroke();
+                pos.right();
+                span = spans[pos.y][pos.x]
+                canvas = span.firstChild;
+                context = canvas.getContext("2d");
+                context.strokeStyle = currentCellColor;
+                context.lineWidth = 5;
+                context.moveTo(0, Math.floor(height / 2));
+                context.lineTo(Math.floor(width / 2), Math.floor(height / 2));
+                context.stroke();
+                //span.dataset.beenTo = "true";
+            }
+            else {
+                console.log("invalid move: right wall");
+            }
+        }
+        else {
+            console.log("invalid move: right border");
+        }
+    }
+    if (pos.x == endPos.x && pos.y == endPos.y) {
+        endFound();
+    }
+    
 }
 
 function resetCell(span) {
-    span.dataset.beenTo = "false";
+    //span.dataset.beenTo = "false";
     canvas = span.firstChild;
     context = canvas.getContext("2d");
     context.strokeStyle = "grey";
@@ -318,6 +331,9 @@ function resetCell(span) {
     }
 }
 
+function endFound() {
+    console.log("Congrats");
+}
 
 function getData() {
     //top, bottom, left, right
