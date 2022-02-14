@@ -99,6 +99,12 @@ function clearStart() {
     console.log("start cleared");
 }
 
+function clearEnd() {
+    context = spans[endPos.y][endPos.x].firstChild.getContext("2d");
+    context.clearRect(0, 0, width, height);
+    console.log("end cleared");
+}
+
 function generate(rows, cols, data) {
     spans = [];
     console.log(data);
@@ -118,7 +124,6 @@ function generate(rows, cols, data) {
             currentCellSpan.setAttribute("data-left", cell.left);
             currentCellSpan.setAttribute("data-right", cell.right);
             //currentCellSpan.setAttribute("data-been-to", cell.beenTo);
-
 
             currentCellCanvas = document.createElement("canvas");
             currentCellCanvas.setAttribute("class", "cell__canvas");
@@ -367,7 +372,7 @@ function getData() {
             new Cell(1, 2, false, false, true, true),
             new Cell(2, 2, true, true, true, false),
             new Cell(3, 2, false, true, false, false),
-            new Cell(4, 2,false, true, false, false),
+            new Cell(4, 2, false, true, false, false),
             new Cell(5, 2, true, true, false, false),
             new Cell(6, 2, false, true, false, true),
             new Cell(7, 2, true, false, true, true),
