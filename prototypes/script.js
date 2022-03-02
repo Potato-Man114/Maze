@@ -1,4 +1,4 @@
-container = document.querySelector("#container");
+mazeContainer = document.querySelector("#maze-container");
 
 const height = 75;
 const width = 75;
@@ -63,7 +63,7 @@ function start() {
     showStart(spans);
     showEnd(spans);
     document.addEventListener('keydown', (e) => {
-        if (firstMove) {
+        if (firstMove && (e.key == "w" || e.key == "s" || e.key == "a" || e.key == "d")) {
             clearStart();
             firstMove = false;
         }
@@ -160,7 +160,7 @@ function generate(rows, cols, data) {
             
         }
         spans.push(spansSub);
-        container.appendChild(currentRow);
+        mazeContainer.appendChild(currentRow);
     }
     console.log(spans);
     return spans;
